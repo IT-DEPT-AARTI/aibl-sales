@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AIBL SALES</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f6b5c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="AIBL SALES">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f2f4f1;--card:#fff;--ink:#16221f;--mut:#6b7a76;--line:#dde3df;--pri:#0f6b5c;--pri2:#d9efe9;--red:#b4472b;--gold:#b8861b;--wa:#1f9d55}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 'Plus Jakarta Sans',system-ui,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:5;background:var(--pri);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.top b{font-size:18px;font-weight:800;letter-spacing:.3px}.top small{opacity:.8;margin-left:auto}.top button{background:#ffffff26;border:0;color:#fff;border-radius:8px;padding:6px 10px}
+.bar{padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap}
+.bar input,.bar select,.f input,.f select,.f textarea,.login input{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px}
+.bar input{flex:1 1 180px;width:auto}.bar select{width:auto;flex:1 1 120px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:0 12px 8px}.tabs button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:7px 13px;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}.tabs i{font-style:normal;opacity:.65;margin-left:5px}
+.wrap{padding:0 12px 80px;max-width:1100px;margin:auto}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;border-left:5px solid var(--pri)}
+.card.pending{border-left-color:var(--red)}.card.today{border-left-color:var(--gold)}.card.done{border-left-color:#9aa7a3;opacity:.8}
+.nm{font-weight:700;font-size:16px}.sub{color:var(--mut);font-size:13px;margin:2px 0 8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.chip{background:var(--pri2);color:var(--pri);border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700}.chip.r{background:#f7e1da;color:var(--red)}
+.act{display:flex;gap:8px}.act a,.act button,.btn{flex:1;text-align:center;border:0;border-radius:10px;padding:10px;text-decoration:none;font-weight:700;color:#fff;background:var(--pri);cursor:pointer}
+.act .wa{background:var(--wa)}.act .ed{background:#e8ece9;color:var(--ink)}.btn.sec{background:#e8ece9;color:var(--ink)}.btn.dg{background:var(--red)}
+.tbl{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:1.4fr 1fr auto;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center}
+.row:last-child{border:0}.row .act{gap:6px}.row .act a,.row .act button{padding:8px 10px;flex:none}
+.sheet{position:fixed;inset:0;background:#0008;z-index:10;display:none;align-items:flex-end;justify-content:center}.sheet.on{display:flex}
+.pane{background:var(--bg);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom))}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:10px}.f label{font-size:12px;color:var(--mut);font-weight:700;display:block;margin-bottom:3px}.f .w{grid-column:1/-1}.f textarea{min-height:70px}
+.login{max-width:360px;margin:12vh auto;padding:20px;display:grid;gap:12px}.login h1{margin:0;color:var(--pri);font-size:30px;font-weight:800}
+.p{padding:12px;max-width:760px;margin:auto}.box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.stat{display:flex;gap:8px;flex-wrap:wrap;padding:0 12px 8px}.stat div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:20px;z-index:20;display:none}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}.hide{display:none!important}
+
+.in{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px}.bar .in{width:auto;flex:1 1 140px}.bar #q{flex:2 1 200px}
+.act .dg{background:var(--red)}.act .dis{background:#e8ece9;color:var(--mut)}input[type=file]{max-width:100%}
+
+.in,input,select,textarea{font-size:16px}
+.pgn{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:12px 0}.pgn .in{width:auto}
+.pb{display:flex;gap:4px;flex-wrap:wrap}.pb button{min-width:38px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px;cursor:pointer}.pb button.on{background:var(--ink);color:#fff;border-color:var(--ink)}.pb button:disabled{opacity:.4;cursor:default}
+.fp{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:0 12px 10px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:12px}.fp label{font-size:12px;color:var(--mut);font-weight:700;display:block;margin-bottom:3px}.fp .w{grid-column:1/-1}
+.bdg{background:var(--red);color:#fff;border-radius:10px;padding:0 6px;margin-left:6px;font-size:12px}.bdg:empty{display:none}
+.row{grid-template-columns:1.5fr 1.1fr .7fr auto}.row.hd{background:#f7f9f7;font-size:12px;font-weight:700;color:var(--mut);cursor:pointer;user-select:none}.row.hd div:last-child{cursor:default}
+@media(max-width:640px){.row{grid-template-columns:1fr auto}.row .c2,.row .c3{grid-column:1/-1}.row.hd{display:none}.row .act{grid-column:1/-1}}
+.top{padding-top:calc(10px + env(safe-area-inset-top))}html{-webkit-text-size-adjust:100%}.login .btn{width:100%}
+</style></head><body>
+<div id="app"></div><div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),E=s=>(s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls=(k,v)=>{try{return v===undefined?localStorage.getItem(k):v===null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){return null}};
+let TK=ls('tk')||'',U=null,H=[],L=[],IDX={},TP=[],TEAM=[],DB={},MAX=0,NN=0,tab='new',view='card',page='leads',q='',who='',saving=0,tpSel=ls('tp')||'';
+const DEFAULT_API='';   // optional: paste your Apps Script Web app /exec URL here to skip the connect screen
+const API=()=>ls('api')||DEFAULT_API;
+async function call(a,d){let r;try{r=await fetch(API(),{method:'POST',body:JSON.stringify({tk:TK,a,d:d||{}})})}catch(e){throw new Error('NETWORK')}
+ let j;try{j=await r.json()}catch(e){throw new Error('Server gave an unexpected reply. Redeploy the web app with access set to "Anyone".')}
+ if(!j.ok){const m=String(j.err||'Error').replace(/^(Error:\s*)+/,'');if(m.includes('SESSION'))logout();throw new Error(m)}return j.r}
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',2600)};
+const OPT={'LEAD TYPE':['Interested','Not Interested',"Didn't receive",'Invalid'],'LEAD STAGE':['NEW LEAD','CONTACTED','FOLLOW UP','SITE VISIT SCHEDULED','SITE VISIT DONE','NEGOTIATION','BOOKED','LOST'],'TEMPERATURE':['HOT','WARM','COLD'],'Customer Type':['Hot ( High Intent)','Warm (shown some interest)','Cold (Low interest or awareness)'],'NEXT ACTION':['CALL','WHATSAPP','SITE VISIT','SEND DETAILS','MEET'],'TYPE OF PROPERTY INTERESTED IN :':['FLAT','PLOT','PENT HOUSE','BUNGALOW'],'PROPERTY DETAIL :':['1BHK','2BHK','3BHK','4BHK'],'LOOKING TO :':['BUY','RENT'],'PUPOSE :':['END USE','INVESTMENT'],'PROJECT NAME :':['ASHOKA ROYALE','ASHOKA IMPRESSION','ASHOKA PALM MEADOWS','ASHOKA KOHINOOR','ASHOKA CORAL'],'AREA :':['SHANKER NAGAR','MOWA','DUNDA'],'Source':['Walk In','Call / Whats App'],'MAIN BARRIER / OBJECTION':['PRICE / BUDGET','LOCATION','POSSESSION TIMELINE','LOAN / FINANCE','COMPARING OPTIONS','NOT NOW','OTHER']};
+const FIELDS=[['LEAD TYPE','Call result','s'],['LEAD STAGE','Stage','s'],['NEXT ACTION','Next action','s'],['NEXT ACTION DATE','Follow-up date','d'],['TEMPERATURE','Temperature','s'],['Customer Type','Customer type','s'],['TYPE OF PROPERTY INTERESTED IN :','Property','s'],['PROPERTY DETAIL :','Config','s'],['PROJECT NAME :','Project','s'],['AREA :','Area','s'],['LOOKING TO :','Looking to','s'],['PUPOSE :','Purpose','s'],['BUDGET (IN LAKHS) :','Budget (lakhs)','t'],['Source','Source','s'],['MAIN BARRIER / OBJECTION','Barrier','s'],['SALES EXECUTIVE NAME :','Sales executive','t'],['REMARK','Remark','a'],['Remarks :','Entry remarks','a'],['LOST REASON','Lost reason','t']];
+const g=(l,k)=>{const i=IDX[k];return i==null||l[i]==null?'':l[i]},today=()=>new Date(Date.now()+19800000).toISOString().slice(0,10);
+function pd(v){v=String(v||'').trim();if(/^\d{4}-\d\d-\d\d/.test(v))return v.slice(0,10);const m=v.match(/^(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-](\d{2,4}))?/);if(!m)return'';let y=m[3]?+m[3]:+today().slice(0,4);if(y<100)y+=2000;return`${y}-${('0'+m[2]).slice(-2)}-${('0'+m[1]).slice(-2)}`}
+function cat(l){const st=g(l,'LEAD STAGE').trim().toUpperCase(),lt=g(l,'LEAD TYPE').trim().toLowerCase(),nd=pd(g(l,'NEXT ACTION DATE')),t=today();
+ if(st=='BOOKED'||st=='LOST'||lt=='not interested'||lt=='invalid')return'done';
+ if(nd)return nd<t?'pending':nd==t?'today':'upcoming';
+ return(!g(l,'LAST CONTACT DATE')&&!lt)?'new':'pending'}
+const ph=l=>String(g(l,'MOBILE NUMBER :')).replace(/\D/g,'').slice(-10);
+const fill=(b,l)=>b.replace(/\{name\}/g,g(l,'NAME :')).replace(/\{project\}/g,g(l,'PROJECT NAME :')||'our project').replace(/\{exec\}/g,U.n).replace(/\{date\}/g,pd(g(l,'NEXT ACTION DATE'))||'a suitable day').replace(/\{action\}/g,(g(l,'NEXT ACTION')||'a call').toLowerCase()).replace(/\{phone\}/g,ph(l));
+const msg=l=>{const t=TP.find(x=>x.id==tpSel)||TP[0];return t?fill(t.body,l):''};
+const waUrl=l=>`https://wa.me/91${ph(l)}?text=${encodeURIComponent(msg(l))}`;
+const syn=t=>{const s=$('#syn');if(s)s.textContent=t};
+function ask(t,inp){return new Promise(ok=>{const d=document.createElement('div');d.className='sheet on';d.style.zIndex=30;d.innerHTML=`<div class="pane"><p><b>${E(t)}</b></p>${inp?'<input id="ai" type="text" class="in">':''}<div class="act" style="margin-top:12px"><button class="btn sec" id="ac">Cancel</button><button class="btn" id="ao">OK</button></div></div>`;document.body.appendChild(d);const x=v=>{d.remove();ok(v)};d.querySelector('#ac').onclick=()=>x(null);d.querySelector('#ao').onclick=()=>x(inp?d.querySelector('#ai').value:true)})}
+
+/* auth */
+function logout(){TK='';ls('tk',null);ls('snap',null);clearInterval(boot.p);loginUI()}
+function loginUI(){$('#app').innerHTML=`<div class="login"><h1>AIBL SALES</h1><input id="em" class="in" type="email" placeholder="Email" autocomplete="username"><input id="pw" class="in" type="password" placeholder="Password" autocomplete="current-password"><button class="btn" id="go">Sign in</button><p class="sub" style="text-align:center"><a href="#" id="chg">Change server</a></p></div>`;
+ $('#go').onclick=async()=>{const b=$('#go');b.disabled=1;try{const r=await call('login',{email:$('#em').value,pw:$('#pw').value});TK=r.tk;ls('tk',TK);boot()}catch(e){toast(e.message);b.disabled=0}};$('#pw').onkeydown=e=>e.key=='Enter'&&$('#go').click();$('#chg').onclick=e=>{e.preventDefault();ls('api',null);connectUI()}}
+function load(r){H=r.h;IDX={};H.forEach((h,i)=>IDX[h]=i);L=r.rows;MAX=r.max;NN=r.n}
+function snap(r){try{localStorage.setItem('snap',JSON.stringify(r))}catch(e){}}
+function connectUI(){$('#app').innerHTML=`<div class="login"><h1>AIBL SALES</h1><p class="sub">Paste your Apps Script Web app URL (it ends with /exec)</p><input id="au" class="in" placeholder="https://script.google.com/macros/s/…/exec"><button class="btn" id="ac2">Connect</button></div>`;
+ $('#ac2').onclick=async()=>{const u=$('#au').value.trim();if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u))return toast('That does not look like a /exec URL');try{const j=await(await fetch(u+'?ping=1')).json();if(!j.ok)throw 0;ls('api',u);start()}catch(e){toast('Could not reach it. Deploy as Web app, access “Anyone”.')}}}
+async function boot(){let r,off=0;$('#app').innerHTML='<div class="empty">Loading…</div>';
+ try{r=await call('init');snap(r)}catch(e){if(!TK)return;let s=null;try{s=JSON.parse(ls('snap'))}catch(x){}
+  if(e.message=='NETWORK'&&s){r=s;off=1}else{$('#app').innerHTML=`<div class="login"><h1>AIBL SALES</h1><p>${E(e.message=='NETWORK'?'No connection. Check your internet and retry.':e.message)}</p><button class="btn" onclick="boot()">Retry</button><button class="btn sec" onclick="logout()">Sign out</button></div>`;return}}
+ U=r.user;TP=r.tpls;TEAM=r.team;DB=r.db;load(r);if(!tpSel&&TP[0])tpSel=TP[0].id;shell();draw();if(off)syn('Offline – saved data');clearInterval(boot.p);boot.p=setInterval(poll,15000)}
+async function poll(){if(saving||document.hidden||!TK)return;try{const r=await call('poll',{since:MAX,n:NN});NN=r.n;MAX=r.max;const id=IDX['Lead ID'];
+ if(r.full)L=r.rows;else{(r.gone||[]).forEach(x=>{L=L.filter(l=>l[id]!=x)});r.rows.forEach(n=>{const i=L.findIndex(x=>x[id]==n[id]);i<0?L.push(n):L[i]=n})}
+ if(r.full||r.rows.length||(r.gone||[]).length){if(page=='leads'&&!$('#sh').classList.contains('on'))list();syn('Synced ✓');snap({user:U,tpls:TP,team:TEAM,db:DB,h:H,rows:L,max:MAX,n:NN})}else if(!saving)syn('Synced ✓')}catch(e){syn('Offline…')}}
+addEventListener('beforeunload',e=>{if(saving){e.preventDefault();e.returnValue=''}});
+
+/* shell */
+function shell(){const adm=U.r=='admin';$('#app').innerHTML=`<div class="top"><b>AIBL SALES</b><small id="syn">Synced ✓</small><button id="ins" class="hide">Install app</button><button id="lo">${E(U.n)} · Exit</button></div>
+<div id="nav" class="tabs" style="padding-top:10px">${adm?[['leads','Leads'],['upload','Bulk upload'],['templates','WhatsApp templates'],['team','Team']].map(([p,n])=>`<button data-p="${p}">${n}</button>`).join(''):''}</div>
+<div id="pg"></div><div class="sheet" id="sh"><div class="pane" id="pane"></div></div>`;
+ $('#lo').onclick=logout;$('#ins').onclick=()=>{if(DP){DP.prompt();DP=null;$('#ins').classList.add('hide')}};if(DP)$('#ins').classList.remove('hide');if(/iphone|ipad/i.test(navigator.userAgent)&&!navigator.standalone&&!ls('ioshint')){ls('ioshint','1');toast('Install: tap Share, then Add to Home Screen')};document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{page=b.dataset.p;draw()});$('#sh').onclick=e=>{if(e.target.id=='sh')closeSh()}}
+const closeSh=()=>{$('#sh').classList.remove('on');if(page=='leads')list()};
+function draw(){document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.p==page));({leads:dLeads,upload:dUpload,templates:dTpl,team:dTeam})[page]()}
+
+/* leads: search + filters + sort + pagination */
+const TABS=[['new','New'],['today','Today'],['pending','Pending'],['upcoming','Upcoming'],['done','Complete'],['all','All']];
+const nz=v=>String(v==null?'':v).trim().toLowerCase();
+const F={stage:'',type:'',temp:'',cust:'',proj:'',area:'',src:'',from:'',to:''};
+const FMAP={stage:['LEAD STAGE','Stage'],type:['LEAD TYPE','Call result'],temp:['TEMPERATURE','Temperature'],cust:['Customer Type','Customer type'],proj:['PROJECT NAME :','Project'],area:['AREA :','Area'],src:['Source','Source']};
+const SORTS={next:['Follow-up date',l=>pd(g(l,'NEXT ACTION DATE'))],name:['Name',l=>nz(g(l,'NAME :'))],stage:['Stage',l=>nz(g(l,'LEAD STAGE'))],last:['Last contact',l=>pd(g(l,'LAST CONTACT DATE'))],proj:['Project',l=>nz(g(l,'PROJECT NAME :'))],upd:['Recently updated',l=>String(Number(g(l,'UPDATED AT'))||0).padStart(15,'0')]};
+let sk='next',sd=1,ps=+ls('ps')||25,pg=1,fo=0;
+const fopts=c=>{const m=new Map();[...(OPT[c]||[]),...L.map(l=>g(l,c))].forEach(v=>{const n=nz(v);if(n&&!m.has(n))m.set(n,String(v).trim())});return[...m].sort((a,b)=>a[1].localeCompare(b[1]))};
+const hay=l=>l._h||(l._h=l.join(' ').toLowerCase()+' '+ph(l));
+function pass(l,toks){if(who&&nz(g(l,'Email Address'))!=nz(who))return 0;
+ for(const k in FMAP)if(F[k]&&nz(g(l,FMAP[k][0]))!=F[k])return 0;
+ if(F.from||F.to){const d=pd(g(l,'NEXT ACTION DATE'));if(!d||(F.from&&d<F.from)||(F.to&&d>F.to))return 0}
+ if(toks.length){const h=hay(l);for(const t of toks)if(h.indexOf(t)<0)return 0}return 1}
+function sortRows(a){const f=SORTS[sk][1];return a.map(l=>[f(l),l]).sort((x,y)=>{const p=x[0],r=y[0];if(p===r)return 0;if(!p)return 1;if(!r)return-1;return sd*p.localeCompare(r,undefined,{numeric:true})}).map(x=>x[1])}
+const nF=()=>Object.keys(F).filter(k=>F[k]).length+(who?1:0);
+function dLeads(){const adm=U.r=='admin';
+ $('#pg').innerHTML=`<div class="bar"><input id="q" class="in" type="search" placeholder="Search anything: name, mobile, project, remark…" value="${E(q)}">${adm?`<select id="who" class="in"><option value="">All telecallers</option>${TEAM.map(t=>`<option value="${E(t.e)}" ${who==t.e?'selected':''}>${E(t.n)}</option>`).join('')}</select>`:''}
+ <select id="tp" class="in">${TP.map(t=>`<option value="${E(t.id)}" ${t.id==tpSel?'selected':''}>WhatsApp: ${E(t.title)}</option>`).join('')}</select><select id="vw" class="in"><option value="card" ${view=='card'?'selected':''}>Card view</option><option value="list" ${view=='list'?'selected':''}>List view</option></select></div>
+ <div class="tabs">${TABS.map(([k,n])=>`<button data-t="${k}" class="${tab==k?'on':''}">${n}<i>0</i></button>`).join('')}</div>
+ <div class="bar" style="padding-top:0"><select id="sk" class="in">${Object.keys(SORTS).map(k=>`<option value="${k}" ${sk==k?'selected':''}>Sort: ${SORTS[k][0]}</option>`).join('')}</select><button class="btn sec" id="sdir" style="flex:0 0 auto">${sd>0?'▲ Asc':'▼ Desc'}</button><button class="btn sec" id="fb" style="flex:0 0 auto">Filters<span class="bdg" id="fn"></span></button></div>
+ <div class="fp ${fo?'':'hide'}" id="fp">${Object.keys(FMAP).map(k=>`<div><label>${FMAP[k][1]}</label><select class="in" data-f="${k}"><option value="">All</option>${fopts(FMAP[k][0]).map(([n,v])=>`<option value="${E(n)}" ${F[k]==n?'selected':''}>${E(v)}</option>`).join('')}</select></div>`).join('')}
+ <div><label>Follow-up from</label><input class="in" type="date" data-f="from" value="${E(F.from)}"></div><div><label>Follow-up to</label><input class="in" type="date" data-f="to" value="${E(F.to)}"></div><div class="w"><button class="btn sec" id="fc" style="width:100%">Clear all filters</button></div></div>
+ <div class="wrap" id="ls"></div><div class="wrap" id="pgn"></div>`;
+ let dt;$('#q').oninput=e=>{clearTimeout(dt);dt=setTimeout(()=>{q=e.target.value;pg=1;list()},250)};
+ if(adm)$('#who').onchange=e=>{who=e.target.value;pg=1;list()};$('#tp').onchange=e=>{tpSel=e.target.value;ls('tp',tpSel);list()};$('#vw').onchange=e=>{view=e.target.value;list()};
+ $('#sk').onchange=e=>{sk=e.target.value;pg=1;list()};$('#sdir').onclick=()=>{sd=-sd;$('#sdir').textContent=sd>0?'▲ Asc':'▼ Desc';pg=1;list()};
+ $('#fb').onclick=()=>{fo=!fo;$('#fp').classList.toggle('hide',!fo)};
+ $('#fp').onchange=e=>{const k=e.target.dataset.f;if(k){F[k]=e.target.value;pg=1;list()}};
+ $('#fc').onclick=()=>{Object.keys(F).forEach(k=>F[k]='');who='';pg=1;dLeads()};
+ document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{tab=b.dataset.t;pg=1;document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x==b));list()});
+ $('#ls').onclick=e=>{const h=e.target.closest('[data-s]');if(h){const k=h.dataset.s;if(sk==k)sd=-sd;else{sk=k;sd=1}$('#sk').value=sk;$('#sdir').textContent=sd>0?'▲ Asc':'▼ Desc';pg=1;return list()}
+  const b=e.target.closest('[data-id]');if(!b)return;if(b.dataset.a=='ed')edit(b.dataset.id);else if(b.tagName=='A')touch(b.dataset.id)};
+ $('#pgn').onclick=e=>{const b=e.target.closest('[data-g]');if(b&&!b.disabled){pg=+b.dataset.g;list();window.scrollTo(0,0)}};
+ $('#pgn').onchange=e=>{if(e.target.id=='ps'){ps=+e.target.value;ls('ps',ps);pg=1;list();window.scrollTo(0,0)}};list()}
+const btns=(id,l)=>{const p=ph(l),i=E(id);return`<div class="act">${p.length==10?`<a data-id="${i}" href="tel:+91${p}">Call</a><a class="wa" data-id="${i}" href="${E(waUrl(l))}" target="_blank" rel="noopener">WhatsApp</a>`:'<a class="dis">No number</a>'}<button class="ed" data-a="ed" data-id="${i}">Edit</button></div>`};
+function pager(n){const pages=Math.max(1,Math.ceil(n/ps));if(pg>pages)pg=pages;if(pg<1)pg=1;const a=n?(pg-1)*ps+1:0,b=Math.min(n,pg*ps),w=[];for(let i=Math.max(1,pg-2);i<=Math.min(pages,pg+2);i++)w.push(i);
+ const B=(p,t,off)=>`<button data-g="${p}" ${off?'disabled':''}>${t}</button>`;
+ return`<div class="pgn"><div class="sub" style="margin:0">${a}–${b} of ${n}</div><div class="pb">${B(1,'«',pg==1)}${B(pg-1,'‹',pg==1)}${w.map(i=>`<button data-g="${i}" class="${i==pg?'on':''}">${i}</button>`).join('')}${B(pg+1,'›',pg==pages)}${B(pages,'»',pg==pages)}</div><select id="ps" class="in">${[10,25,50,100].map(x=>`<option value="${x}" ${x==ps?'selected':''}>${x} / page</option>`).join('')}</select></div>`}
+function list(){const toks=q.toLowerCase().split(/\s+/).filter(Boolean),base=L.filter(l=>pass(l,toks)),cnt={all:base.length};
+ base.forEach(l=>{const c=cat(l);cnt[c]=(cnt[c]||0)+1});document.querySelectorAll('[data-t] i').forEach(i=>i.textContent=cnt[i.parentNode.dataset.t]||0);
+ const fn=$('#fn');if(fn)fn.textContent=nF()?nF():'';
+ const a=sortRows(tab=='all'?base:base.filter(l=>cat(l)==tab)),el=$('#ls');if(!el)return;pg=Math.min(pg,Math.max(1,Math.ceil(a.length/ps)));
+ if(!a.length){$('#pgn').innerHTML='';el.innerHTML=`<div class="empty">${!L.length?(U.r=='admin'?'No leads yet. Use Bulk upload to add your data.':'No leads assigned to you yet.'):(q||nF())?'No leads match your search or filters.':'No leads here. Nice and clear.'}</div>`;return}
+ const it=l=>{const id=g(l,'Lead ID'),c=cat(l),nd=pd(g(l,'NEXT ACTION DATE')),dt=nd?`<span class="chip ${c=='pending'?'r':''}">${nd.split('-').reverse().join('/')}</span>`:'';
+  const st=`<span class="chip">${E(g(l,'LEAD STAGE').trim()||'NEW LEAD')}</span>${g(l,'LEAD TYPE')?`<span class="chip">${E(g(l,'LEAD TYPE'))}</span>`:''}`;
+  const sub=E([ph(l),g(l,'PROJECT NAME :'),U.r=='admin'?(TEAM.find(t=>nz(t.e)==nz(g(l,'Email Address')))||{}).n:''].filter(Boolean).join(' • '));
+  return view=='card'?`<div class="card ${c}"><div class="nm">${E(g(l,'NAME :')||'(no name)')}</div><div class="sub">${sub}</div><div class="chips">${st}${dt}</div>${g(l,'REMARK')?`<div class="sub">${E(g(l,'REMARK'))}</div>`:''}${btns(id,l)}</div>`
+  :`<div class="row"><div><div class="nm" data-a="ed" data-id="${E(id)}">${E(g(l,'NAME :')||'(no name)')}</div><div class="sub" style="margin:0">${sub}</div></div><div class="chips c2" style="margin:0">${st}</div><div class="chips c3" style="margin:0">${dt}</div>${btns(id,l)}</div>`};
+ const hd=view=='list'?`<div class="row hd">${[['name','Name'],['stage','Stage'],['next','Follow-up']].map(([k,n])=>`<div data-s="${k}">${n}${sk==k?(sd>0?' ▲':' ▼'):''}</div>`).join('')}<div></div></div>`:'';
+ el.innerHTML=(view=='card'?'<div class="cards">':'<div class="tbl">'+hd)+a.slice((pg-1)*ps,pg*ps).map(it).join('')+'</div>';$('#pgn').innerHTML=pager(a.length)}
+const touch=id=>patch(id,{'LAST CONTACT DATE':today()});
+
+/* editor + debounced sync */
+const Q={};
+function patch(id,p){const l=L.find(x=>g(x,'Lead ID')==id);if(!l)return;Object.keys(p).forEach(k=>{if(IDX[k]!=null)l[IDX[k]]=p[k]});l._h=0;const o=Q[id]=Q[id]||{p:{}};Object.assign(o.p,p);saving=1;syn('Saving…');clearTimeout(o.t);o.t=setTimeout(()=>flush(id),800)}
+async function flush(id){const o=Q[id],b=o.p;o.p={};try{await call('upd',{id,p:b})}catch(e){Object.assign(b,o.p);o.p=b;syn('Retrying…');o.t=setTimeout(()=>flush(id),5000);return}
+ saving=Object.values(Q).some(x=>Object.keys(x.p).length)?1:0;if(!saving)syn('Synced ✓')}
+function edit(id){const l=L.find(x=>g(x,'Lead ID')==id);if(!l)return;const adm=U.r=='admin',p=ph(l);
+ const fld=([k,lb,t])=>{const v=t=='d'?pd(g(l,k)):g(l,k);return`<div class="${t=='a'?'w':''}"><label>${lb}</label>`+(t=='s'?`<select class="in" data-k="${E(k)}"><option value=""></option>${[...new Set([...OPT[k],v].filter(Boolean))].map(o=>`<option ${o==v?'selected':''}>${E(o)}</option>`).join('')}</select>`:t=='a'?`<textarea class="in" data-k="${E(k)}">${E(v)}</textarea>`:`<input class="in" data-k="${E(k)}" type="${t=='d'?'date':'text'}" value="${E(v)}">`)+'</div>'};
+ $('#pane').innerHTML=`<h3 style="margin:0 0 4px">${E(g(l,'NAME :'))}</h3><div class="sub">${E(p)}</div>${p.length==10?`<div class="act" style="margin-bottom:12px"><a data-id="${E(id)}" href="tel:+91${p}">Call</a><a class="wa" data-id="${E(id)}" href="${E(waUrl(l))}" target="_blank" rel="noopener">WhatsApp</a></div>`:''}
+ <div class="f"><div><label>Name</label><input class="in" data-k="NAME :" value="${E(g(l,'NAME :'))}"></div><div><label>Mobile</label><input class="in" data-k="MOBILE NUMBER :" value="${E(g(l,'MOBILE NUMBER :'))}" inputmode="tel"></div>
+ ${adm?`<div class="w"><label>Assigned to</label><select class="in" data-k="Email Address"><option value=""></option>${TEAM.map(t=>`<option value="${E(t.e)}" ${t.e==g(l,'Email Address')?'selected':''}>${E(t.n)}</option>`).join('')}</select></div>`:''}${FIELDS.map(fld).join('')}</div>
+ <p><button class="btn" id="dn" style="width:100%">Done</button></p>`;
+ $('#sh').classList.add('on');$('#dn').onclick=closeSh;$('#pane').onclick=e=>{const a=e.target.closest('a[data-id]');if(a)touch(a.dataset.id)};
+ const free=['NEXT ACTION DATE','REMARK','Remarks :','LOST REASON','NAME :','MOBILE NUMBER :','Email Address'];
+ document.querySelectorAll('#pane [data-k]').forEach(i=>{const k=i.dataset.k,fn=()=>{const p={[k]:i.value};if(free.indexOf(k)<0){p['LAST CONTACT DATE']=today();if(k=='LEAD TYPE'&&i.value&&!g(l,'LEAD STAGE').trim())p['LEAD STAGE']='CONTACTED'}patch(id,p)};i.oninput=fn;i.onchange=fn})}
+
+/* admin: bulk upload */
+let UP=[];
+function dUpload(){$('#pg').innerHTML=`<div class="p"><div class="box"><h3 style="margin-top:0">Bulk upload leads</h3><p class="sub">Excel or CSV using your LEADS_MASTER headers (NAME :, MOBILE NUMBER :, PROJECT NAME : …). Sheet “MAIN” is used if present; otherwise the first sheet.</p>
+ <input type="file" id="fl" accept=".xlsx,.xls,.csv"><p id="pv" class="sub"></p>
+ <div class="f"><div class="w"><label>Distribution</label><select class="in" id="md"><option value="alt">Alternate: ${E(TEAM.map(t=>t.n).join(' → '))}</option><option value="keep">Keep assignment from file (Email Address column)</option></select></div>
+ <div class="w"><label><input type="checkbox" id="dd" checked style="width:auto"> Skip mobile numbers already in the sheet</label></div></div>
+ <p><button class="btn" id="goup" disabled>Upload</button></p></div></div>`;
+ $('#fl').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(!window.XLSX)throw new Error('Spreadsheet reader not loaded – check internet');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),ws=wb.Sheets.MAIN||wb.Sheets[wb.SheetNames[0]];
+  UP=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,dateNF:'yyyy-mm-dd'}).map(r=>{const o={};Object.keys(r).forEach(k=>o[k.trim()]=typeof r[k]=='string'?r[k].trim():r[k]);return o}).filter(o=>Object.values(o).some(v=>String(v).trim()));
+  $('#pv').textContent=`${UP.length} leads ready from “${f.name}”`;$('#goup').disabled=!UP.length}catch(x){toast(x.message)}};
+ $('#goup').onclick=async()=>{const b=$('#goup');b.disabled=1;let a=0,s=0;try{for(let i=0;i<UP.length;i+=200){b.textContent=`Uploading ${Math.min(i+200,UP.length)}/${UP.length}…`;const r=await call('add',{rows:UP.slice(i,i+200),mode:$('#md').value,dedupe:$('#dd').checked});a+=r.added;s+=r.skipped}
+  toast(`Added ${a}, skipped ${s} duplicates`);UP=[];load(await call('init'));page='leads';tab='all';draw()}catch(e){toast('Upload failed: '+e.message+' (rows already sent stay added)');b.disabled=0;b.textContent='Upload'}}}
+
+/* admin: WhatsApp template maker */
+let cur=null;
+function dTpl(){if(!cur||(cur.id&&!TP.find(t=>t.id==cur.id)))cur=TP[0]?{...TP[0]}:{id:'',title:'',body:''};
+ $('#pg').innerHTML=`<div class="p"><div class="box"><div class="tabs" style="padding:0 0 8px">${TP.map(t=>`<button data-i="${E(t.id)}" class="${cur.id==t.id?'on':''}">${E(t.title)}</button>`).join('')}<button id="nt">+ New</button></div>
+ <div class="f"><div class="w"><label>Template name</label><input class="in" id="tt" value="${E(cur.title)}"></div><div class="w"><label>Message</label><textarea class="in" id="tb" style="min-height:130px">${E(cur.body)}</textarea></div></div>
+ <div class="chips" style="margin-top:8px">${['name','project','exec','date','action','phone'].map(v=>`<span class="chip" style="cursor:pointer" data-v="{${v}}">{${v}}</span>`).join('')}</div>
+ <div class="box" style="background:#e9f7ee;white-space:pre-wrap" id="pvw"></div><div class="act"><button id="sv">Save template</button>${cur.id?'<button class="dg" id="dl">Delete</button>':''}</div></div></div>`;
+ const pv=()=>{const l=[];[['NAME :','Amit Sharma'],['PROJECT NAME :','ASHOKA ROYALE'],['NEXT ACTION','CALL'],['NEXT ACTION DATE',today()],['MOBILE NUMBER :','9876543210']].forEach(([k,v])=>{if(IDX[k]!=null)l[IDX[k]]=v});$('#pvw').textContent=fill($('#tb').value,l)};pv();$('#tb').oninput=pv;
+ document.querySelectorAll('[data-v]').forEach(c=>c.onclick=()=>{const t=$('#tb');t.setRangeText(c.dataset.v,t.selectionStart,t.selectionEnd,'end');pv();t.focus()});
+ document.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{cur={...TP.find(t=>t.id==b.dataset.i)};dTpl()});$('#nt').onclick=()=>{cur={id:'',title:'',body:''};dTpl()};
+ $('#sv').onclick=async()=>{const d={id:cur.id,title:$('#tt').value.trim(),body:$('#tb').value};if(!d.title)return toast('Add a template name');try{const had=TP.length;TP=await call('tplSave',d);cur=cur.id?{...TP.find(t=>t.id==cur.id)}:{...TP[TP.length-1]};if(!tpSel&&TP[0])tpSel=TP[0].id;toast('Template saved');dTpl()}catch(e){toast(e.message)}};
+ if(cur.id)$('#dl').onclick=async()=>{if(await ask('Delete this template?')){try{TP=await call('tplDel',{id:cur.id});cur=null;dTpl()}catch(e){toast(e.message)}}}}
+
+/* admin: team */
+function dTeam(){$('#pg').innerHTML=`<div class="p">${TEAM.map(m=>{const a=L.filter(l=>g(l,'Email Address')==m.e),c={};a.forEach(l=>{const k=cat(l);c[k]=(c[k]||0)+1});
+ return`<div class="box"><b>${E(m.n)}</b><div class="sub">${E(m.e)}</div><div class="stat">${TABS.slice(0,5).map(([k,n])=>`<div>${n}: <b>${c[k]||0}</b></div>`).join('')}<div>Total: <b>${a.length}</b></div></div><button class="btn sec" style="width:100%" data-pw="${E(m.e)}">Set new password</button></div>`}).join('')}
+ <div class="box"><b>Admin</b><div class="sub">${E(U.e)}</div><button class="btn sec" style="width:100%" data-pw="${E(U.e)}">Set new password</button></div>
+ <p class="sub">Default password for all accounts is aibl@123 – change it here.<br>Database sheet: <a href="${E(DB.url)}" target="_blank" rel="noopener">${E(DB.name)}</a></p></div>`;
+ document.querySelectorAll('[data-pw]').forEach(b=>b.onclick=async()=>{const e=b.dataset.pw,p=await ask('New password for '+e,1);if(!p)return;try{await call('setpw',{email:e,pw:p});toast('Password updated')}catch(x){toast(x.message)}})}
+
+let DP=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();DP=e;const b=$('#ins');if(b)b.classList.remove('hide')});
+function start(){API()?(TK?boot():loginUI()):connectUI()}
+if(typeof navigator!='undefined'&&'serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+start();
+</script></body></html>
