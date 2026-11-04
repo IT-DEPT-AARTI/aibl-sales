@@ -54,7 +54,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 const $=s=>document.querySelector(s),E=s=>(s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ls=(k,v)=>{try{return v===undefined?localStorage.getItem(k):v===null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){return null}};
 let TK=ls('tk')||'',U=null,H=[],L=[],IDX={},TP=[],TEAM=[],DB={},MAX=0,NN=0,tab='new',view='card',page='leads',q='',who='',saving=0,tpSel=ls('tp')||'';
-const DEFAULT_API='';   // optional: paste your Apps Script Web app /exec URL here to skip the connect screen
+const DEFAULT_API='https://script.google.com/macros/s/AKfycbz4kNXBXqtgN3x2Op7YrjZ_zYqGBJuQKj78A-1y184Dp1Auwpo42MJHieq7wdx8DoDqBg/exec';   // optional: paste your Apps Script Web app /exec URL here to skip the connect screen
 const API=()=>ls('api')||DEFAULT_API;
 async function call(a,d){let r;try{r=await fetch(API(),{method:'POST',body:JSON.stringify({tk:TK,a,d:d||{}})})}catch(e){throw new Error('NETWORK')}
  let j;try{j=await r.json()}catch(e){throw new Error('Server gave an unexpected reply. Redeploy the web app with access set to "Anyone".')}
